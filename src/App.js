@@ -9,7 +9,7 @@ function App() {
   const [datac, setDatac] = useState(null);
   const [labels, setLabels] = useState(null);
   const [receipts, setReceipts] = useState([]);
-  const [unique, setUnique] = useState([]);
+  const [unique, setUnique] = useState(null);
   const [chechdata, setCheckdata] = useState(false);
 
   // get data from github 
@@ -24,105 +24,107 @@ function App() {
     )
   }
 
-  useEffect(() => {
+  // ---------- for labels (names branch recipts)
+  //--- note arr has to be the same structure as receipts
+  const forTables = (arr) => {
     var alllabels = [];
+    for (let index = 0; index < arr.length; index++) {
+      alllabels.push(arr[index].branch.city);
+    }
+    return alllabels;
+  }
 
-    getData().then(() => {
-     
-      // ---------- for labels (names branch recipts)
-      for (let index = 0; index < receipts.length; index++) {
-        alllabels.push(receipts[index].branch.city);
-      }
-      setLabels(alllabels);
+  //  -------- const makeSum
+  const makeSum = (arr) => {
+    var t = 0;
+    var sumData = [];
+    arr.map(e => {
+      sumData[t] = parseFloat(0);
+      e.items.map(i => sumData[t] = sumData[t] + parseFloat(i.price));
+      t++;
+    });
+    return sumData;
+  }
 
-      // -------- for sum recipte
-      var t=0;
-      var sumData = [];
-      receipts.map(e=>{
-        sumData[t]=parseFloat(0);
-        console.log(e);
-        e.items.map(i=>sumData[t]=sumData[t]+parseFloat(i.price));
-        t++;
+  //------- get num of unique in arr
+  const getNumUnique = (arr) => {
+    var init = 0;
+    var numUnique = [];
+    arr.map(e => {
+      numUnique[init] = 0;
+      e.items.map(i => {
+        if (i.count > 20) {
+          numUnique[init] = numUnique[init] + 1;
+        }
       });
-      
+      init++;
+    })
+    return numUnique;
+  }
+
+
+  useEffect(() => {
+    getData().then(() => {
+      // ---------- for labels (names branch recipts)
+      setLabels(forTables(receipts));
+
       // --------- unique goods
       // --------- assuming that more than 20 unit sold is a unique item
-      var init=0;
-      var numUnique=[];
-      receipts.map(e=>{
-        numUnique[init]=0;
-        e.items.map(i=>{
-          if (i.count>20) {
-            numUnique[init]=numUnique[init]+1;
-          }
-        });
-        init++;
-      })
-      setUnique(numUnique);      
-      
+      setUnique(getNumUnique(receipts));
+
       //------- fill up data
       setDatac([
         {
           label: 'sum of every receipte',
-          data:sumData,
+          data: makeSum(receipts),
           backgroundColor: 'rgba(255, 99, 132, 0.6)',
           borderWidth: 3
-        },{
+        }, {
           label: 'Unique Items',
-          data:numUnique,
+          data: unique,
           backgroundColor: 'rgba(0, 99, 132, 0.6)',
           borderWidth: 3
         }
       ]);
-
-
       //------ make sure that data loaded
-      if (labels===null||labels===[]||setDatac.data===[]||setDatac.data===null||unique===[]||unique===null||unique===undefined) {
-        setCheckdata(true);
-      }
-    
-    });
 
+      if ((!datac || !labels || (!unique || unique.length === 0))) {
+        if (chechdata) {
+          setCheckdata(false);
+
+        } else
+          setCheckdata(true);
+      }
+
+    });
   }, [chechdata])
 
   // --------------filter date
-  const handelFilterDate=(start,end)=>{
-    var arr=[...receipts];
-    var rez=[];
-    var sdate=new Date(start);
-    var edate=new Date(end);
-    console.log(sdate<edate);
-    rez=arr.filter(e=>new Date(e.createdOn)>=new Date(start)&&new Date(e.createdOn)<=new Date(end));
-
-    var t=0;
-    var sumData = [];
-    rez.map(e=>{
-      sumData[t]=parseFloat(0);
-      console.log(e);
-      e.items.map(i=>sumData[t]=sumData[t]+parseFloat(i.price));
-      t++;
-    });
-    var newTable=[];
+  const handelFilterDate = (start, end) => {
+    var arr = [...receipts];
+    var rez = [];
+    var sdate = new Date(start);
+    var edate = new Date(end);
+    rez = arr.filter(e => new Date(e.createdOn) >= new Date(start) && new Date(e.createdOn) <= new Date(end));
+    
+    setLabels(forTables(rez));
+    setUnique(getNumUnique(rez));
     setDatac([
       {
         label: 'sum of every receipte',
-        data:sumData,
+        data: makeSum(rez),
         backgroundColor: 'rgba(255, 99, 132, 0.6)',
         borderWidth: 3
+      }, {
+        label: 'Unique Items',
+        data: unique,
+        backgroundColor: 'rgba(0, 99, 132, 0.6)',
+        borderWidth: 3
       }
-
-      
     ]);
-    var alllabels = [];
-
-    for (let index = 0; index < rez.length; index++) {
-      alllabels.push(rez[index].branch.city);
-    }
-    setLabels(alllabels);
-
   }
 
-  if (!datac || !labels || !receipts) {
+  if (!datac || !labels || !receipts || !unique) {
     return <h1>please wait</h1>
   }
 
@@ -132,7 +134,7 @@ function App() {
         <h1 className="center ">Sawa</h1>
       </nav>
 
-      <Chart datas={datac} labels={labels} graphTitel="Over View On Receipts" handelFilterDate={handelFilterDate}/>
+      <Chart datas={datac} labels={labels} graphTitel="Over View On Receipts" handelFilterDate={handelFilterDate} />
 
 
     </div>

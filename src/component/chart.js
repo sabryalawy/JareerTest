@@ -29,8 +29,8 @@ const Chart = (props) => {
                 <div>
                     <h3>{props.graphTitel}</h3>
                     <div>
-                    <input className="d-inline" type="date" id="date1"/>
-                    <input className="d-inline m-3" type="date" id="date2"/>
+                    <label className="m-2">start :</label><input className="d-inline m-4" type="date" id="date1"/>
+                    <label >end :</label><input className="d-inline m-3" type="date" id="date2"/>
                     <button type="button" className="btn btn-primary" onClick={()=>props.handelFilterDate(document.getElementById("date1").value,document.getElementById("date2").value)}>filter</button>
                     </div>
                 </div>
