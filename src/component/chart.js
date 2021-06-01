@@ -56,7 +56,7 @@ const Chart = (props) => {
                 />
                 <div className="card text-white bg-info m-3 text-left d-inline-block" >
                     <div className="card-body ">
-                        <h5 className="card-title">{props.totaltitle} = {(Math.round(total*100))/100}</h5>
+                        <h5 className="card-title">{props.totaltitle} = {new Intl.NumberFormat().format(total)}</h5>
                     </div>
                 </div>
             </div>
