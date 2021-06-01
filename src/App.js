@@ -6,11 +6,16 @@ import Axios from "axios";
 
 
 function App() {
+  // ---------- Receipts
+  const [receipts, setReceipts] = useState([]);
   const [datac, setDatac] = useState(null);
   const [labels, setLabels] = useState(null);
-  const [receipts, setReceipts] = useState([]);
   const [unique, setUnique] = useState(null);
   const [chechdata, setCheckdata] = useState(false);
+
+  // ----------- category
+  const [lableCat, setLabelCat] = useState(null);
+  const [dataCat, setDataCat] = useState(null);
 
   // get data from github 
   const getData = async () => {
@@ -22,6 +27,68 @@ function App() {
         setReceipts(receipt);
       }
     )
+  }
+
+  //how many did evrey category sales on a period if time
+  const categorySalesOnperiodOfTime=(start,end)=>{
+    var arr = [...receipts];
+    var rez = [];
+    var sdate = new Date(start);
+    var edate = new Date(end);
+    rez = arr.filter(e => new Date(e.createdOn) >= new Date(start) && new Date(e.createdOn) <= new Date(end));
+    if (rez===[]) {
+      console.log("yes");
+    }
+    setDataCat(        [
+      {
+        label: 'sum of every category ',
+        data: sumForEachCat(rez),
+        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+        borderWidth: 3
+      }
+    ]
+  );
+    setLabelCat(getLabelCat(rez))
+
+  }
+
+
+  //for labels (catigories)
+  const getLabelCat = (arr) => {
+    
+    var o = 0;
+    var rez = [];
+    if (arr.length)
+      arr.map(e => {
+        e.items.map(i => {
+          if (!rez.find(e => e === i.category)) {
+            rez.push(i.category)
+          }
+          o++;
+        });
+      });
+    return rez
+  }
+
+  //sum for each catigory
+  const sumForEachCat = (arr) => {
+    var init = 0;
+    var rez = Array(12);
+    for (let index = 0; index < rez.length; index++) {
+      rez[index] = init;
+
+    }
+
+    if (lableCat && lableCat.indexOf("Meat") !== -1 && arr.length) {
+
+      arr.map(e => {
+        e.items.map(i => {
+          rez[lableCat.indexOf(i.category)] = rez[lableCat.indexOf(i.category)] + i.count;
+        })
+      })
+
+    }
+    return rez;
   }
 
   // ---------- for labels (names branch recipts)
@@ -62,8 +129,8 @@ function App() {
     return numUnique;
   }
 
-
   useEffect(() => {
+
     getData().then(() => {
       // ---------- for labels (names branch recipts)
       setLabels(forTables(receipts));
@@ -72,7 +139,10 @@ function App() {
       // --------- assuming that more than 20 unit sold is a unique item
       setUnique(getNumUnique(receipts));
 
-      //------- fill up data
+      // -------- lable cats
+      setLabelCat(getLabelCat(receipts));
+
+      //------- fill up data receipts
       setDatac([
         {
           label: 'sum of every receipte',
@@ -86,9 +156,20 @@ function App() {
           borderWidth: 3
         }
       ]);
-      //------ make sure that data loaded
 
-      if ((!datac || !labels || (!unique || unique.length === 0))) {
+      //---------- fill up data catigory
+      setDataCat(
+        [
+          {
+            label: 'sum of every category ',
+            data: sumForEachCat(receipts),
+            backgroundColor: 'rgba(255, 99, 132, 0.6)',
+            borderWidth: 3
+          }
+        ]
+      );
+      //------ make sure that data loaded
+      if ((!datac || !labels || (!unique || unique.length === 0) || !lableCat ||!lableCat.length ||!dataCat||!dataCat.length)) {
         if (chechdata) {
           setCheckdata(false);
 
@@ -99,7 +180,7 @@ function App() {
     });
   }, [chechdata])
 
-  // --------------filter date
+  // --------------filter date receipts
   const handelFilterDate = (start, end) => {
     var arr = [...receipts];
     var rez = [];
@@ -124,7 +205,7 @@ function App() {
     ]);
   }
 
-  if (!datac || !labels || !receipts || !unique) {
+  if (!datac || !labels || !receipts || !unique||!dataCat||!lableCat) {
     return <h1>please wait</h1>
   }
 
@@ -134,7 +215,8 @@ function App() {
         <h1 className="center ">Sawa</h1>
       </nav>
 
-      <Chart datas={datac} labels={labels} graphTitel="Over View On Receipts" handelFilterDate={handelFilterDate} />
+      <Chart datas={datac} labels={labels} graphTitel="Over View On Receipts" handelFilterDate={handelFilterDate}/>
+      <Chart datas={dataCat} labels={lableCat} graphTitel="Over View On Categories Sales" handelFilterDate={categorySalesOnperiodOfTime} />
 
 
     </div>
