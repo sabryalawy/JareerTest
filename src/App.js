@@ -30,32 +30,31 @@ function App() {
   }
 
   //how many did evrey category sales on a period if time
-  const categorySalesOnperiodOfTime=(start,end)=>{
+  const categorySalesOnperiodOfTime = (start, end) => {
     var arr = [...receipts];
     var rez = [];
     var sdate = new Date(start);
     var edate = new Date(end);
     rez = arr.filter(e => new Date(e.createdOn) >= new Date(start) && new Date(e.createdOn) <= new Date(end));
-    if (rez===[]) {
-      console.log("yes");
-    }
-    setDataCat(        [
-      {
-        label: 'sum of every category ',
-        data: sumForEachCat(rez),
-        backgroundColor: 'rgba(255, 99, 132, 0.6)',
-        borderWidth: 3
-      }
-    ]
-  );
-    setLabelCat(getLabelCat(rez))
+    if (rez.length) {
 
+
+      setDataCat([
+        {
+          label: 'sum of every category ',
+          data: sumForEachCat(rez),
+          backgroundColor: 'rgba(255, 99, 132, 0.6)',
+          borderWidth: 3
+        }
+      ]
+      );
+      setLabelCat(getLabelCat(rez))
+    }
   }
 
 
   //for labels (catigories)
   const getLabelCat = (arr) => {
-    
     var o = 0;
     var rez = [];
     if (arr.length)
@@ -169,7 +168,7 @@ function App() {
         ]
       );
       //------ make sure that data loaded
-      if ((!datac || !labels || (!unique || unique.length === 0) || !lableCat ||!lableCat.length ||!dataCat||!dataCat.length)) {
+      if ((!datac || !labels || (!unique || unique.length === 0) || !lableCat || !lableCat.length || !dataCat || !dataCat.length)) {
         if (chechdata) {
           setCheckdata(false);
 
@@ -187,25 +186,26 @@ function App() {
     var sdate = new Date(start);
     var edate = new Date(end);
     rez = arr.filter(e => new Date(e.createdOn) >= new Date(start) && new Date(e.createdOn) <= new Date(end));
-    
-    setLabels(forTables(rez));
-    setUnique(getNumUnique(rez));
-    setDatac([
-      {
-        label: 'sum of every receipte',
-        data: makeSum(rez),
-        backgroundColor: 'rgba(255, 99, 132, 0.6)',
-        borderWidth: 3
-      }, {
-        label: 'Unique Items',
-        data: unique,
-        backgroundColor: 'rgba(0, 99, 132, 0.6)',
-        borderWidth: 3
-      }
-    ]);
+    if (rez.length) {
+      setLabels(forTables(rez));
+      setUnique(getNumUnique(rez));
+      setDatac([
+        {
+          label: 'sum of every receipte',
+          data: makeSum(rez),
+          backgroundColor: 'rgba(255, 99, 132, 0.6)',
+          borderWidth: 3
+        }, {
+          label: 'Unique Items',
+          data: unique,
+          backgroundColor: 'rgba(0, 99, 132, 0.6)',
+          borderWidth: 3
+        }
+      ]);
+    }
   }
 
-  if (!datac || !labels || !receipts || !unique||!dataCat||!lableCat) {
+  if (!datac || !labels || !receipts || !unique || !dataCat || !lableCat) {
     return <h1>please wait</h1>
   }
 
@@ -215,8 +215,8 @@ function App() {
         <h1 className="center ">Sawa</h1>
       </nav>
 
-      <Chart  datas={datac} labels={labels} graphTitel="Over View On Receipts" handelFilterDate={handelFilterDate} totaltitle="Total Price Of All Recepts"/>
-      <Chart  datas={dataCat} labels={lableCat} graphTitel="Over View On Categories Sales" handelFilterDate={categorySalesOnperiodOfTime} totaltitle="Total Quantity Sold"/>
+      <Chart datas={datac} labels={labels} graphTitel="Over View On Receipts" handelFilterDate={handelFilterDate} totaltitle="Total Price Of All Recepts" />
+      <Chart datas={dataCat} labels={lableCat} graphTitel="Over View On Categories Sales" handelFilterDate={categorySalesOnperiodOfTime} totaltitle="Total Uints Sold From All Categories" />
 
 
     </div>

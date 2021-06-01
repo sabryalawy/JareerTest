@@ -17,7 +17,6 @@ const Chart = (props) => {
         })
         setTotal(rez);
 
-
         setDatac({
             labels: props.labels,
             datasets: props.datas
@@ -40,8 +39,8 @@ const Chart = (props) => {
                 <div>
                     <h3>{props.graphTitel}</h3>
                     <div>
-                        <label >start :</label><input className="d-inline m-4" type="date" onChange={(e) => setDates(e.target.value)} value={dates} />
-                        <label >end :</label><input className="d-inline m-3" type="date" onChange={(e) => { e.preventDefault(); setDatee(e.target.value); }} value={datee} />
+                        <label >start :</label><input className="d-inline m-4" type="date" onChange={(e) => {setDates(e.target.value);props.handelFilterDate(dates, datee);}} value={dates} />
+                        <label >end :</label><input className="d-inline m-3" type="date" onChange={(e) => { setDatee(e.target.value); props.handelFilterDate(dates, datee)}} value={datee} />
                         <button type="button" className="btn btn-primary" onClick={() => props.handelFilterDate(dates, datee)}>filter</button>
                     </div>
                 </div>
