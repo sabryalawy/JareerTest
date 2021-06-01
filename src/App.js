@@ -215,8 +215,8 @@ function App() {
         <h1 className="center ">Sawa</h1>
       </nav>
 
-      <Chart datas={datac} labels={labels} graphTitel="Over View On Receipts" handelFilterDate={handelFilterDate}/>
-      <Chart datas={dataCat} labels={lableCat} graphTitel="Over View On Categories Sales" handelFilterDate={categorySalesOnperiodOfTime} />
+      <Chart  datas={datac} labels={labels} graphTitel="Over View On Receipts" handelFilterDate={handelFilterDate} totaltitle="Total Price Of All Recepts"/>
+      <Chart  datas={dataCat} labels={lableCat} graphTitel="Over View On Categories Sales" handelFilterDate={categorySalesOnperiodOfTime} totaltitle="Total Quantity Sold"/>
 
 
     </div>
