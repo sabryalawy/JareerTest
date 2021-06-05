@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import Chart from "./component/chart";
 import { useEffect, useState } from 'react';
 import Axios from "axios";
+import Table from "./component/table";
 
 
 function App() {
@@ -16,7 +17,8 @@ function App() {
   // ----------- category
   const [lableCat, setLabelCat] = useState(null);
   const [dataCat, setDataCat] = useState(null);
-
+  const [catFilter, setCatFilter] = useState("other");
+  const [catTableData,setCatTableData]=useState();
   // get data from github 
   const getData = async () => {
     var receipt = [];
@@ -29,6 +31,17 @@ function App() {
     )
   }
 
+  const filterCategoryTable=()=>{
+    // console.log(catFilter);
+    var rez=[];
+    receipts.map(e=>{
+      e.items.map(i=>{
+        if (catFilter===i.category)
+          rez.push({city:e.branch.city,storename:e.branch.name,productname:i.name,createdon:e.createdOn,count:i.count});
+      });
+    })
+    setCatTableData(rez);
+  }
   //how many did evrey category sales on a period if time
   const categorySalesOnperiodOfTime = (start, end) => {
     var arr = [...receipts];
@@ -215,8 +228,19 @@ function App() {
         <h1 className="center ">Sawa</h1>
       </nav>
 
-      <Chart datas={datac} labels={labels} graphTitel="Over View On Receipts" handelFilterDate={handelFilterDate} totaltitle="Total Price Of All Recepts" />
-      <Chart datas={dataCat} labels={lableCat} graphTitel="Over View On Categories Sales" handelFilterDate={categorySalesOnperiodOfTime} totaltitle="Total Uints Sold From All Categories" />
+      <Chart datas={datac} labels={labels} graphTitel="Over View On Receipts" handelFilterDate={handelFilterDate} totaltitle="Total Price Of All Recepts" dataType="recepits" alldata={receipts} makeSum={makeSum} forTables={forTables} setLabels={setLabels} setDatac={setDatac} />
+      <Chart datas={dataCat} labels={lableCat} graphTitel="Over View On Categories Sales" handelFilterDate={categorySalesOnperiodOfTime} totaltitle="Total Uints Sold From All Categories" dataType="category" alldata={receipts} />
+
+      <br />
+      <div className="card m-5 ">
+        <h3 className='m-5'>Select Category</h3>
+        <select className='m-5' value={catFilter} onChange={e => setCatFilter(e.target.value)}>
+          {lableCat.map(e => <option key={e}>{e}</option>)}
+        </select>
+        <button type="button " className="btn btn-primary d-inline m-5" onClick={() => filterCategoryTable()}>filter</button>
+        <Table tableData={catTableData}/>
+      </div>
+
 
 
     </div>
